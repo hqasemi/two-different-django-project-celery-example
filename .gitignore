@@ -1,6 +1,8 @@
 .idea
 venv
 
-*.sqlite3
-
 __pycache__
+
+# DB
+*.sqlite3
+*.sqlite

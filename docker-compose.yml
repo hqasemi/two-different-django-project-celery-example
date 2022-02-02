@@ -1,0 +1,25 @@
+version: '3.0'
+services:
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    privileged: false
+    restart: always
+    ports:
+      - "5672:5672"
+  consumer:
+    build: consumer_django_project/.
+    command: celery -A consumer_django_project worker -l info
+    volumes:
+      - ./consumer_django_project:/code
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq"
+  producer:
+    build: producer_django_project/.
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./producer_django_project:/code
+    ports:
+      - "8000:8000"
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq"
