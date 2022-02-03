@@ -1,18 +1,10 @@
 from typing import Any
 
+from celery import states as celery_result_states
 from celery.result import AsyncResult
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 from producer_django_project.celery import app
-
-
-class TaskResultStatusChoices(models.TextChoices):
-    PENDING = "PENDING", _("PENDING")
-    STARTED = "STARTED", _("STARTED")
-    RETRY = "RETRY", _("RETRY")
-    FAILURE = "FAILURE", _("FAILURE")
-    SUCCESS = "SUCCESS", _("SUCCESS")
 
 
 class TaskModel(models.Model):
@@ -22,14 +14,15 @@ class TaskModel(models.Model):
 
     @property
     def task_result(self) -> Any:
-        result = self.__task_result.result
-        return result
+        result = self.__get_task_result_instance().result
+        if self.task_status == celery_result_states.SUCCESS:
+            return result
+        return None
 
     @property
-    def task_status(self) -> TaskResultStatusChoices:
-        return TaskResultStatusChoices(self.__task_result.status)
+    def task_status(self) -> str:
+        return str(self.__get_task_result_instance().status)
 
-    @property
-    def __task_result(self) -> AsyncResult:
+    def __get_task_result_instance(self) -> AsyncResult:
         result = app.AsyncResult(self.task_id)
         return result

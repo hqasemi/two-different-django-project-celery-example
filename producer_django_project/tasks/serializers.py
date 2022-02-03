@@ -1,19 +1,19 @@
 import logging
 
+from celery import states as celery_result_states
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from producer_django_project.celery import app
-from tasks.models import TaskModel, TaskResultStatusChoices
+from tasks.models import TaskModel
 
 logger = logging.getLogger(__name__)
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    """ Base task serializer class which performs field validations and
+    """ Base task serializer class which performs field validations """
 
-    """
     class Meta:
         model = TaskModel
         # fields = '__all__'
@@ -28,7 +28,7 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
     task_id = serializers.ReadOnlyField()
-    is_revoked = serializers.BooleanField(required=False)
+    is_revoked = serializers.ReadOnlyField(required=False)
 
     def create(self, validated_data):
         task_name = validated_data.get('task_name')
@@ -38,6 +38,20 @@ class TaskSerializer(serializers.ModelSerializer):
         validated_data['task_id'] = task_id
 
         return super().create(validated_data)
+
+
+class TaskRevokeSerializer(TaskSerializer):
+    class Meta:
+        model = TaskModel
+
+        # no field is needed to get involved in serializer
+        # we just need this serializer to validate the is_revoked field
+        # which is being set manually in view
+        fields = (
+            'is_revoked',
+        )
+
+    is_revoked = serializers.BooleanField()
 
     def validate_is_revoked(self, is_revoked: bool):
         if self.instance is None and is_revoked:
@@ -51,8 +65,8 @@ class TaskSerializer(serializers.ModelSerializer):
             )
 
         revoked_is_not_allowed_task_states = (
-            TaskResultStatusChoices.SUCCESS,
-            TaskResultStatusChoices.FAILURE,
+            celery_result_states.SUCCESS,
+            celery_result_states.FAILURE,
         )
 
         if self.instance.task_status in revoked_is_not_allowed_task_states and is_revoked:
@@ -69,7 +83,3 @@ class TaskSerializer(serializers.ModelSerializer):
             )
 
         return is_revoked
-
-
-class TaskRevokeSerializer(TaskSerializer):
-    task_name = serializers.ReadOnlyField()
