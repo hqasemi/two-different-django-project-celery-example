@@ -22,7 +22,7 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", 'amqp://guest:guest@loca
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = 'db+sqlite:///results2.sqlite'
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", 'db+sqlite:///results2.sqlite')
 CELERY_TASK_SERIALIZER = 'json'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,6 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # third party
+    'rest_framework',
+
+    # my apps
+    'tasks',
 ]
 
 MIDDLEWARE = [

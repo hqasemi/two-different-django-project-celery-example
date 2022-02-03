@@ -15,8 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from tasks.views import TasksModelViewSet
+
+# Create a router and register our viewsets with it.
+router = DefaultRouter()
+router.register(r'tasks', TasksModelViewSet, basename='tasks')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('tasks/', include('tasks.urls')),
+
+    # apps urls
+    path(r'', include(router.urls)),
 ]
