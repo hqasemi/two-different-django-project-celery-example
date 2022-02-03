@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from producer_django_project.celery import app
 from tasks.models import TaskModel
-from tasks.serializers import TaskSerializer
+from tasks.serializers import TaskSerializer, TaskRevokeSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +31,6 @@ class TasksModelViewSet(mixins.CreateModelMixin,
 
         - Create a new task in DB.
         """
-        task_name = request.data.get('task_name')
-        res = app.send_task(task_name, args=[1, 2, ])
-
-        task_id = res.id
-        request.data['task_id'] = task_id
-
         return super().create(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
@@ -54,12 +48,21 @@ class TasksModelViewSet(mixins.CreateModelMixin,
         return super().retrieve(request, *args, **kwargs)
 
     @action(detail=True, methods=["POST"], url_path="revoke", url_name=None)
-    def soft_delete(self, request, *args, **kwargs):
+    def revoke(self, request, *args, **kwargs):
         """ Revoke a task """
-        task: TaskModel = self.get_object()
-        if task.is_revoked:
-            return Response(status=status.HTTP_200_OK, data="The task has been already revoked")
+        task_instance: TaskModel = self.get_object()
 
-        task.is_revoked = True
-        task.save()
+        # pass `is_revoked` as request.data, so that it could be validated in serializer
+        # we also need to pass current instance to notify the serializer that
+        # an instance is already existed, e.g., it is not a create request.
+        request.data['is_revoked'] = True
+        serializer = TaskRevokeSerializer(instance=task_instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # revoke the celery task
+        app.control.revoke(task_instance.task_id)
+
+        # set is_revoked for this task
+        serializer.save()
+
         return Response(status=status.HTTP_200_OK, data="The task is now revoked")
