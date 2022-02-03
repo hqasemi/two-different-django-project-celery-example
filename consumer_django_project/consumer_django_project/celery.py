@@ -1,6 +1,10 @@
+import logging
 import os
+import time
 
 from celery import Celery
+
+logger = logging.getLogger(__name__)
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'consumer_django_project.settings')
@@ -17,10 +21,16 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 
-@app.task(name='task_1', bind=True)
-def sample_task(self, arg1):
-    """ A sample_task which can be run in another process (microservice)
-    using its name (here 'task_1')"""
-    # print(f'Request: {self.request!r}')
-    output = f"Task1 is being run using argument: {arg1}"
-    return output
+@app.task(name='sum', bind=True)
+def sum_task(self, a: float, b: float) -> float:
+    """ A sample task which can be run in another
+    process (microservice) using its name (here 'sum')
+    """
+    task_name = self.name
+    logger.info(f"Task named '{task_name}' is being run "
+                f"using arguments: '{a}' and '{b}'")
+
+    # We use 20 seconds delay just to simulate a task which take some time to be done
+    time.sleep(20)
+
+    return a + b
