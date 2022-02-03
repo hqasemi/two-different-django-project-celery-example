@@ -1,3 +1,5 @@
 Django==3.2
 sqlalchemy>=1.0.14
 celery>=5.0.5
+
+psycopg2-binary>=2.9.3
