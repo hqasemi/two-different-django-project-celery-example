@@ -24,7 +24,20 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", 'amqp://guest:guest@loca
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", 'db+sqlite:///results2.sqlite')
+
+# Read more about celery result backed options
+# https://docs.celeryproject.org/en/latest/userguide/configuration.html#database-backend-settings
+# CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", 'db+sqlite:///results2.sqlite')
+pg_username = os.environ.get('POSTGRES_USER', 'postgres')
+pg_password = os.environ.get('POSTGRES_PASSWORD', 'postgres')
+pg_db_name = os.environ.get('POSTGRES_NAME', 'tasks')
+pg_host = os.environ.get('POSTGRES_HOST', 'localhost')
+
+CELERY_RESULT_BACKEND = os.environ.get(
+    "CELERY_RESULT_BACKEND",
+    f'db+postgresql://{pg_username}:{pg_password}@{pg_host}/{pg_db_name}'
+)
+
 CELERY_TASK_SERIALIZER = 'json'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
