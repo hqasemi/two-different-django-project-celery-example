@@ -25,6 +25,7 @@ class TasksModelViewSet(mixins.CreateModelMixin,
     """
     queryset = TaskModel.objects.all()
     serializer_class = TaskSerializer
+    lookup_field = 'task_id'
 
     def create(self, request, *args, **kwargs):
         """ Creates a new task
@@ -68,11 +69,3 @@ class TasksModelViewSet(mixins.CreateModelMixin,
         task.is_revoked = True
         task.save()
         return Response(status=status.HTTP_200_OK, data="The task is now revoked")
-
-
-def run_task_sum_view(request):
-    res = app.send_task('sum', args=[1, 2, ])
-    task_id = res.id
-    task_output = res.get()
-    return HttpResponse(content=f"Task '{task_id}' is done, result: '{task_output}'",
-                        status=200)
