@@ -30,7 +30,7 @@ def sum_task(self, a: float, b: float) -> float:
     logger.info(f"Task named '{task_name}' is being run "
                 f"using arguments: '{a}' and '{b}'")
 
-    # We use 20 seconds delay just to simulate a task which take some time to be done
+    # We use 20 seconds delay just to simulate a task which takes some time to be done
     time.sleep(20)
 
     return a + b
