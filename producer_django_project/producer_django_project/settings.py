@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     # third party
     'rest_framework',
+    'drf_yasg',  # swagger: https://drf-yasg.readthedocs.io/en/stable/readme.html
 
     # my apps
     'tasks',
@@ -135,3 +136,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SWAGGER_SETTINGS = {
+    # Disable Django Login button which is being used for session login
+    # https://drf-yasg.readthedocs.io/en/stable/settings.html#use-session-auth
+    'USE_SESSION_AUTH': False
+}
