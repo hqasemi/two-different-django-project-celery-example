@@ -40,11 +40,6 @@ class TasksModelViewSet(mixins.CreateModelMixin,
 
         return super().create(request, *args, **kwargs)
 
-        # task_id = res.id
-        # task_output = res.get()
-        # return Response(data=f"Task '{task_id}' is done, result: '{task_output}'",
-        #                 status=status.HTTP_200_OK)
-
     def list(self, request, *args, **kwargs):
         """ Lists all the available tasks
 
