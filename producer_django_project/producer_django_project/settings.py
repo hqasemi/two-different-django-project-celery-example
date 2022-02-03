@@ -23,6 +23,11 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", 'amqp://guest:guest@loca
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", 'db+sqlite:///results2.sqlite')
+
+# If set to True, result messages will be persistent. This means the messages won’t be lost after a broker restart.
+# https://docs.celeryproject.org/en/stable/userguide/configuration.html#std-setting-result_persistent
+CELERY_RESULT_PERSISTENT = True
+
 CELERY_TASK_SERIALIZER = 'json'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
