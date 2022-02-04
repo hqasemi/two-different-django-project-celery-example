@@ -3,7 +3,7 @@ services:
   db:
     image: postgres
     volumes:
-      - ./postgres/data/db:/var/lib/postgresql/data
+      - ./postgres/container-data:/var/lib/postgresql/data
       - ./postgres/docker-entrypoint-initdb.d/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     environment:
       - POSTGRES_NAME=${POSTGRES_NAME}
@@ -16,13 +16,18 @@ services:
     container_name: rabbitmq
     privileged: false
     restart: always
+    # to persist rabbitmq container data it needs to set hostname and volume
+    hostname: rabbitmq
+    volumes:
+      - "./rabbitmq/container-data:/var/lib/rabbitmq/mnesia/"
     ports:
       - "5672:5672"
   consumer:
     build: consumer_django_project/.
-    command: celery -A consumer_django_project worker -l info
+    command: sh run_worker.sh
     volumes:
       - ./consumer_django_project:/code
+      - ./celery/container-data:/var/run/celery/
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq"
       POSTGRES_NAME: ${POSTGRES_NAME}
