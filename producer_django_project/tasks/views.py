@@ -1,12 +1,11 @@
 import logging
 
 from drf_yasg.utils import swagger_auto_schema
+from producer_django_project.celery import app
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
-from producer_django_project.celery import app
 from tasks.models import TaskModel
 from tasks.serializers import TaskSerializer, TaskRevokeSerializer
 
@@ -65,8 +64,10 @@ class TasksModelViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
 
         # revoke the celery task
-        # app.control.revoke(task_instance.task_id, terminate=True, signal='SIGKILL')
-        app.control.revoke(task_instance.task_id, terminate=True)
+        # terminate=True and `signal='SIGKILL'` are both added to force revoking
+        # a task even if it is running
+        app.control.revoke(task_instance.task_id, terminate=True, signal='SIGKILL')
+        # app.control.revoke(task_instance.task_id)
 
         # set is_revoked for this task
         serializer.save()
