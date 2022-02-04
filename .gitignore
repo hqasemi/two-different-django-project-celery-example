@@ -8,3 +8,14 @@ __pycache__
 *.sqlite
 
 */data/db/*
+*.db
+*.state
+
+# RabbitMQ container data
+rabbitmq/container-data
+
+# Postgres container data
+postgres/container-data
+
+# Celery container data
+celery/container-data
