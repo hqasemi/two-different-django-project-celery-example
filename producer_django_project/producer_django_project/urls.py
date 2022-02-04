@@ -24,9 +24,9 @@ from tasks.views import TasksModelViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Employees API",
+        title="Celery Tasks API",
         default_version='v1',
-        description="Swagger for Employee CRUD project",
+        description="Swagger for Celery Tasks Project",
         # terms_of_service="https://www.google.com/policies/terms/",
         # contact=openapi.Contact(email="contact@snippets.local"),
         # license=openapi.License(name="BSD License"),
