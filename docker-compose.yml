@@ -3,7 +3,7 @@ services:
   db:
     image: postgres
     volumes:
-      - ./postgres/container-data:/var/lib/postgresql/data
+      - ./container-data/postgres:/var/lib/postgresql/data
       - ./postgres/docker-entrypoint-initdb.d/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     environment:
       - POSTGRES_NAME=${POSTGRES_NAME}
@@ -19,15 +19,15 @@ services:
     # to persist rabbitmq container data it needs to set hostname and volume
     hostname: rabbitmq
     volumes:
-      - "./rabbitmq/container-data:/var/lib/rabbitmq/mnesia/"
+      - "./container-data/rabbitmq:/var/lib/rabbitmq/mnesia/"
     ports:
       - "5672:5672"
   consumer:
-    build: consumer_django_project/.
+    build: src/consumer_django_project/.
     command: sh run_worker.sh
     volumes:
-      - ./consumer_django_project:/code
-      - ./celery/container-data:/var/run/celery/
+      - ./src/consumer_django_project:/code
+      - ./container-data/celery/:/var/run/celery/
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq"
       POSTGRES_NAME: ${POSTGRES_NAME}
@@ -42,10 +42,10 @@ services:
       mode: replicated
       replicas: 3 # number of consumer workers
   producer:
-    build: producer_django_project/.
+    build: src/producer_django_project/.
     command: sh run_server.sh
     volumes:
-      - ./producer_django_project:/code
+      - ./src/producer_django_project:/code
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
