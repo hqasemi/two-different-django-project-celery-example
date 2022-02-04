@@ -40,6 +40,12 @@ CELERY_RESULT_BACKEND = os.environ.get(
 
 CELERY_TASK_SERIALIZER = 'json'
 
+# celery revoke state is not persistent, to make sure that revokes are persistent
+# it needs to set a state db
+# https://docs.celeryproject.org/en/3.1/configuration.html#celeryd-state-db
+# https://docs.celeryproject.org/en/latest/userguide/workers.html#worker-persistent-revokes
+CELERYD_STATE_DB = os.environ.get('CELERYD_STATE_DB', "celery_state.db")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -14,15 +14,16 @@ class TaskModel(models.Model):
 
     @property
     def task_result(self) -> Any:
-        result = self.__get_task_result_instance().result
         if self.task_status == celery_result_states.SUCCESS:
+            result = self.__task_result_instance.result
             return result
         return None
-
+       
     @property
     def task_status(self) -> str:
-        return str(self.__get_task_result_instance().status)
+        return str(self.__task_result_instance.status)
 
-    def __get_task_result_instance(self) -> AsyncResult:
+    @property
+    def __task_result_instance(self) -> AsyncResult:
         result = app.AsyncResult(self.task_id)
         return result
