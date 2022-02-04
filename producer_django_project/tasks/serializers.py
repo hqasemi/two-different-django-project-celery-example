@@ -1,12 +1,13 @@
 import logging
+from datetime import timedelta, datetime
 
-from celery import states as celery_result_states
 from django.utils.translation import gettext_lazy as _
+from producer_django_project.celery import app
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-
-from producer_django_project.celery import app
 from tasks.models import TaskModel
+
+from celery import states as celery_result_states
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,10 @@ class TaskSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         task_name = validated_data.get('task_name')
 
-        res = app.send_task(task_name, args=[1, 2, ])
+        schedule_time = datetime.now() + timedelta(seconds=50)
+        # we added `eta`, which leads the task to be run after 50 seconds
+        res = app.send_task(task_name, args=[1, 2, ], eta=schedule_time)
+
         task_id = res.id
         validated_data['task_id'] = task_id
 
