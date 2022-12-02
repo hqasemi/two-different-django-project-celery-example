@@ -1,7 +1,7 @@
 # Two Different Django Projects using a Shared Queue to Communicate (producer-consumer)
 
 In this demo project, we are going to find a way to implement a mechanism in which two independent Django microservices
-can communicate together.
+can communicate with each other.
 
 ## How to run
 
