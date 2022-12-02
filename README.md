@@ -18,7 +18,7 @@ We use `--compatibility` to enable running multiple instances of a single servic
 After running the project, open your browser and navigate to `127.0.0.1:8000/swagger`:
 ![Swagger](docs/images/swagger.png)
 
-To remove the existing docker containers just press `ctrl+c` and the run
+To remove the existing docker containers just press `ctrl+c` and then run the following command:
 
 ```shell
 docker-compose down
